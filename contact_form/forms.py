@@ -167,7 +167,7 @@ class ContactBaseForm(forms.Form):
         Render the subject of the message to a string.
         
         """
-        subject = loader.render_to_string(self.subject_template_name,
+        subject = settings.EMAIL_SUBJECT_PREFIX + loader.render_to_string(self.subject_template_name,
                                           self.get_context())
         return ''.join(subject.splitlines())
     
@@ -216,6 +216,7 @@ class ContactBaseForm(forms.Form):
         for message_part in ('from_email', 'message', 'recipient_list', 'subject'):
             attr = getattr(self, message_part)
             message_dict[message_part] = callable(attr) and attr() or attr
+        
         return message_dict
     
     def get_current_site(self):
