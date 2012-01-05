@@ -142,6 +142,8 @@ class ContactBaseForm(forms.Form):
         super(ContactBaseForm, self).__init__(data=data, files=files, *args, **kwargs)
         self.request = request
     
+    required_css_class = 'clsRequired required' # adds class to the entire field row
+
     from_email = settings.DEFAULT_FROM_EMAIL
     
     recipient_list = [mail_tuple[1] for mail_tuple in settings.MANAGERS]
