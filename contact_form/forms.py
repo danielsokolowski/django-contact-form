@@ -11,7 +11,7 @@ from django.core.mail import send_mail
 from django.template import loader, RequestContext
 from django.contrib.sites.models import Site, RequestSite
 from django.utils.translation import ugettext_lazy as _
-
+from django.core.mail import EmailMessage
 
 __all__ = ('ContactBaseForm', 'ContactForm', 'AkismetContactForm')
 
@@ -241,7 +241,15 @@ class ContactBaseForm(forms.Form):
         Build and send the email message.
         
         """
-        send_mail(fail_silently=fail_silently, **self.get_message_dict())
+        context = self.get_context()
+        message_dict = self.get_message_dict()
+        message_dict.update({'headers': {'Reply-To': context['email']}})
+        message_dict.update({'to': message_dict['recipient_list']}) # EmailMessage accepts to **kwarg not recpipent-list
+        del message_dict['recipient_list'] # or we get invalid kwarg arugmenet EmailMessage
+        message_dict.update({'body': message_dict['message']}) # EmailMessage accepts "body" **kwarg not "message"
+        del message_dict['message'] # or we get invalid kwarg arugmenet for EmailMessage
+        email = EmailMessage(**message_dict)
+        email.send(fail_silently=fail_silently)
 
 
 class ContactForm(ContactBaseForm):
